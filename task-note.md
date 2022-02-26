@@ -1,0 +1,3 @@
+- setup project
+- create random maze with Pygame
+- GUI.py ? visualization?
