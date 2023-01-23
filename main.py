@@ -126,6 +126,11 @@ class menu():
         self.panel = pygame.Surface(panel_size)
         self.panel.fill(DARKJADE)
         self.panel.set_alpha(120)
+        
+        help_panel_size = (self.current_w, self.current_h // 4)
+        self.help_panel = pygame.Surface(help_panel_size)
+        self.help_panel.fill(GREY)
+        self.help_panel.set_alpha(120)
     
     def DrawButton(self, screen):
         index = 0
@@ -142,7 +147,11 @@ class menu():
         self.get_screen_size()
         if self.menu_reveal:            
             screen.blit(self.panel, (self.start_pos[0]-100,self.start_pos[1]-100))
-            self.DrawButton(screen)        
+            self.DrawButton(screen)
+    
+    def draw_help_panel(self, screen):
+        self.get_screen_size()
+        screen.blit(self.help_panel, (0, self.current_h // 4 * 3))        
 
     def toggle_input(self, input):
         if self.in_progress and self.in_progress != input:
@@ -177,9 +186,9 @@ if __name__ == '__main__':
             if event.type == KEYDOWN:
                 if event.key == K_s:
                     menu.toggle_input("START")
-                if event.key == K_e:
+                if event.key == K_a:
                     menu.toggle_input("END")
-                if event.key == K_o:
+                if event.key == K_d:
                     menu.toggle_input("OBSTACLE")
                 if event.key == K_BACKSPACE:
                     menu.reset()
@@ -208,6 +217,8 @@ if __name__ == '__main__':
         app.draw_nodes(screen)
         # Draw menu section
         menu.draw_menu_panel(screen)
+        # Draw help button
+        # menu.draw_help_panel(screen)
         
         # debug(f"{pygame.mouse.get_pos()}", pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         
