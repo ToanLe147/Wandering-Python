@@ -1,4 +1,5 @@
 from scripts.parameters import *
+from scripts.pathfinding import *
 
 class app():
     def __init__(self) -> None:        
@@ -9,14 +10,22 @@ class app():
         self.end_node = None
         self.draw_start = False
         self.draw_end = False
+        # self.draw_path = False
+        self.path = None
+        self.path_drawing_index = 0
             
     def get_screen_size(self):
         self.current_w = pygame.display.Info().current_w
         self.current_h = pygame.display.Info().current_h
     
+    # def find_path(self):        
+    #     if self.start_node and self.end_node:
+    #         self.path = astar(self.maze, self.start_node, self.end_node)
+    #     print(self.path)
+    
     def update_display_elements(self, node_size=default_node_size):
         self.get_screen_size()
-        self.obstacle = []
+        self.obstacle = []        
         self.node_size = node_size
         self.x_padding = self.current_w % self.node_size / 2
         self.y_padding = self.current_h % self.node_size / 2
@@ -25,9 +34,10 @@ class app():
         self.grid_rows = self.current_h // self.node_size        
         size = (self.node_size, self.node_size)
         self.grid = [ [Rect((self.x_padding + columne_index*self.node_size, self.y_padding + row_index*self.node_size), size) for row_index in range(self.grid_rows)] for columne_index in range(self.grid_columes) ]
-        self.tgrid = [ [(self.x_padding + columne_index*self.node_size, self.y_padding + row_index*self.node_size) for row_index in range(self.grid_rows)] for columne_index in range(self.grid_columes) ]
+        self.maze = [ [0]*self.grid_rows for columne_index in range(self.grid_columes) ]
         # print(self.grid_rows, self.grid_columes)
-        # print(self.tgrid)        
+        # print(self.maze)
+        # print(self.grid.__len__(), self.maze.__len__())
     
     def draw_borders(self, screen):
         pygame.draw.rect(screen, BLACK, Rect((0,0), (self.current_w, self.y_padding)))
@@ -72,6 +82,11 @@ class app():
             row = self.end_node[0]
             colume = self.end_node[1]
             pygame.draw.rect(screen, GREEN, self.grid[row][colume])
+        if self.path:
+            for index in range(int(self.path_drawing_index)):                
+                cell = self.path[index]
+                pygame.draw.rect(screen, DARKBLUE, self.grid[cell[0]][cell[1]])
+            self.path_drawing_index = self.path_drawing_index + 10/fps if self.path_drawing_index < len(self.path) else len(self.path)
 
     def mouse_interact(self):            
         mouse_pos_x = pygame.mouse.get_pos()[0]
@@ -93,6 +108,9 @@ class app():
             self.obstacle = []
             self.start_node = None
             self.end_node = None            
+            self.path = None
+            self.path_drawing_index = 0
+            self.maze = [ [0]*self.grid_rows for columne_index in range(self.grid_columes) ]
         return False  # toggle off the reset signal
 
 class menu():
@@ -104,6 +122,7 @@ class menu():
         self.button_list["END"] = Button("PICK END", btn_highlight=RED, cb=[self.toggle_input, "END"])
         self.button_list["OBSTACLE"] = Button("DRAW OBSTACLE", cb=[self.toggle_input, "OBSTACLE"])        
         self.button_list["RESET"] = Button("RESET", cb=[self.reset])
+        self.button_list["RESUME"] = Button("RESUME", cb=[self.resume])
         
         self.menu_reveal = False
         self.in_progress = None
@@ -111,6 +130,7 @@ class menu():
         self.draw_obstacles = False
         self.draw_start = False
         self.draw_end = False
+        # self.draw_path = False
     
     def get_screen_size(self):
         self.current_w = pygame.display.Info().current_w
@@ -174,6 +194,9 @@ class menu():
     
     def reset(self):
         self.reset_signal = True
+    
+    def resume(self):
+        self.menu_reveal = not self.menu_reveal
 
 
 if __name__ == '__main__':
@@ -184,16 +207,19 @@ if __name__ == '__main__':
             if event.type == QUIT:
                 running = False            
             if event.type == KEYDOWN:
-                if event.key == K_s:
-                    menu.toggle_input("START")
                 if event.key == K_a:
+                    menu.toggle_input("START")
+                if event.key == K_s:
                     menu.toggle_input("END")
                 if event.key == K_d:
                     menu.toggle_input("OBSTACLE")
                 if event.key == K_BACKSPACE:
                     menu.reset()
                 if event.key == K_RETURN:
-                    menu.confirm_button_callback()
+                    # menu.confirm_button_callback()
+                    if app.start_node and app.end_node:
+                        app.path = path_finder(app.maze, tuple(app.start_node), tuple(app.end_node), app.obstacle)                   
+                    print("path \n", app.path)
                 if event.key == K_ESCAPE:
                     menu.toggle_menu()
                 if event.key == K_f:
@@ -207,7 +233,7 @@ if __name__ == '__main__':
         app.is_menu_on = menu.menu_reveal
         app.draw_obstacle = menu.draw_obstacles
         app.draw_start = menu.draw_start
-        app.draw_end = menu.draw_end
+        app.draw_end = menu.draw_end        
         menu.reset_signal = app.reset(menu.reset_signal)
         
         # Background
