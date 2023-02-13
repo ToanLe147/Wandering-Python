@@ -1,5 +1,6 @@
 from scripts.parameters import *
 from scripts.pathfinding import *
+import asyncio
 
 class app():
     def __init__(self) -> None:        
@@ -198,8 +199,8 @@ class menu():
     def resume(self):
         self.menu_reveal = not self.menu_reveal
 
-
-if __name__ == '__main__':
+async def main():
+    global running, screen, app, menu
     app = app()
     menu = menu()
     while running:                                        
@@ -250,6 +251,12 @@ if __name__ == '__main__':
         
         debug(f"{menu.in_progress if menu.in_progress else ''}", pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         pygame.display.update()
-        clock.tick(fps)    
+        clock.tick(fps)
+        await asyncio.sleep(0)
+
+
+if __name__ == '__main__':    
+    asyncio.run(main())
+    
 
 
