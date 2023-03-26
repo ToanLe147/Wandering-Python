@@ -1,4 +1,6 @@
-import pathfinding
+import asyncio
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
 
 from scripts.parameters import *
 
@@ -37,14 +39,14 @@ class menu():
 class pathfinder():
     def __init__(self, matrix) -> None:
         self.matrix = matrix
+        self.grid = Grid(self.matrix)
 
 
 class player():
     pass
 
 
-if __name__ == "__main__":
-    
+async def main():    
     while running:
         for event in pygame.event.get():            
             if event.type == QUIT:
@@ -54,4 +56,11 @@ if __name__ == "__main__":
         debug(f"{pygame.mouse.get_pos()}", pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         pygame.display.update()
         clock.tick(fps)
-        
+        await asyncio.sleep(0)
+
+
+if __name__ == '__main__':    
+    asyncio.run(main())
+    
+
+
