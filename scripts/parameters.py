@@ -1,4 +1,6 @@
-import pygame, os
+from collections import namedtuple
+
+import pygame
 from pygame.locals import *
 
 pygame.init()
@@ -21,16 +23,16 @@ OATYELLOW = "#f1e3bc"
 HONEYYELLOW = "#ffb703"
 ORANGE = "#fb8500"
 
-default_width = 1366
-default_height = 768
-max_width = pygame.display.Info().current_w
-max_height = pygame.display.Info().current_w
-fullscreen_flag = False
+default_width = 1280
+default_height = 720
 screen = pygame.display.set_mode((default_width, default_height))
 running = True
 fps = 60
 font = pygame.font.SysFont("Arial", 30)
 default_node_size = 50
+
+
+btn_config = namedtuple("btn_config", ["pos", "width", "height", "elevation", "offset"])
 
 
 class Button:
@@ -51,14 +53,14 @@ class Button:
     def draw(self, screen, width, height, pos, elevation, disable=False):
         # Okay
         self.elevation = elevation        
-        self.original_y_pos = pos[1]                		                
+        self.original_y_pos = pos[1] - height//2                		                
 
         # top rectangle 
-        self.top_rect = pygame.Rect(pos, (width,height))
+        self.top_rect = pygame.Rect((pos[0] - width//2, pos[1] - height//2), (width,height))
         self.text_rect = self.text_surf.get_rect(center = self.top_rect.center)
 
         # bottom rectangle 
-        self.bottom_rect = pygame.Rect(pos, (width,height))		        
+        self.bottom_rect = pygame.Rect((pos[0] - width//2, pos[1] - height//2), (width,height))		        
 
         # elevation logic 
         self.top_rect.y = self.original_y_pos - self.elevation         
