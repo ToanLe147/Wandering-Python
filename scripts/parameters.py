@@ -26,13 +26,12 @@ ORANGE = "#fb8500"
 default_width = 1280
 default_height = 720
 screen = pygame.display.set_mode((default_width, default_height))
-running = True
 fps = 60
 font = pygame.font.SysFont("Arial", 30)
-default_node_size = 50
+default_node_size = 20
 
 
-btn_config = namedtuple("btn_config", ["pos", "width", "height", "elevation", "offset"])
+btn_config = namedtuple("btn_config", ["pos", "width", "height", "elevation"])
 
 
 class Button:

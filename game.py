@@ -1,5 +1,6 @@
 from scripts.parameters import *
 from scripts.pathfinding import *
+import asyncio
 
 class app():
     def __init__(self) -> None:        
@@ -136,16 +137,14 @@ class menu():
         self.current_w = pygame.display.Info().current_w
         self.current_h = pygame.display.Info().current_h
         
-        self.start_pos = (self.current_w//2, self.current_h//2)
+        self.start_pos = (self.current_w//4, self.current_h//4)
         self.button_width = 250
         self.button_height = 40
         self.button_elevation = 5
         self.offset = (self.start_pos[1] + (len(self.button_list) * self.button_height)) // (len(self.button_list) + 1) if self.button_list else 50
-        self.button_start_pos_initial = self.start_pos[1] - (len(self.button_list) * self.button_height) // 2
         
         panel_size = (self.button_width + 200, self.button_height*len(self.button_list) + self.offset*(len(self.button_list)-1) + 200)
         self.panel = pygame.Surface(panel_size)
-        self.panel_rectangle = self.panel.get_rect(center = self.start_pos)        
         self.panel.fill(DARKJADE)
         self.panel.set_alpha(120)
         
@@ -158,17 +157,17 @@ class menu():
         index = 0
         x = self.start_pos[0]
         for button in self.button_list:
-            new_button_pos = (x, self.button_start_pos_initial + index * self.offset)
+            new_button_pos = (x, self.start_pos[1] + index * self.offset)
             if self.in_progress == button or not self.in_progress:
                 self.button_list[button].draw(screen, self.button_width, self.button_height, new_button_pos, self.button_elevation)
             else:
                 self.button_list[button].draw(screen, self.button_width, self.button_height, new_button_pos, self.button_elevation, True)
             index += 1
     
-    def draw_menu_panel(self, screen: pygame.SurfaceType):
+    def draw_menu_panel(self, screen):
         self.get_screen_size()
         if self.menu_reveal:            
-            screen.blit(self.panel, self.panel_rectangle)
+            screen.blit(self.panel, (self.start_pos[0]-100,self.start_pos[1]-100))
             self.DrawButton(screen)
     
     def draw_help_panel(self, screen):
@@ -200,8 +199,8 @@ class menu():
     def resume(self):
         self.menu_reveal = not self.menu_reveal
 
-
-if __name__ == '__main__':
+async def main():
+    global running, screen, app, menu
     app = app()
     menu = menu()
     while running:                                        
@@ -252,6 +251,12 @@ if __name__ == '__main__':
         
         debug(f"{menu.in_progress if menu.in_progress else ''}", pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         pygame.display.update()
-        clock.tick(fps)    
+        clock.tick(fps)
+        await asyncio.sleep(0)
+
+
+if __name__ == '__main__':    
+    asyncio.run(main())
+    
 
 
